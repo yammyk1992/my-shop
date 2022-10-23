@@ -1,0 +1,145 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>{{title}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .related_image {
+          width: 100px;
+          height: 100px;
+        }
+    </style>
+</head>
+<body class="p-3 m-0 border-0 bd-example">
+      <!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <img src="/static/images/shop2.jpeg" alt="" width="30" height="24" class="d-inline-block align-top">
+      E-Shop
+    </a>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+
+      <a class="nav-link" href="{% url 'cart' %}">Корзина <span class="btn btn-danger">{{ cart.products.count }}</span></a>
+      </li>
+      </ul>
+  </div>
+      <ul class="navbar-nav my-2 my-lg-0">
+      {% if request.user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+             {{ user.username }}
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'profile_account' %}">Edit Profile</a></li>
+          </ul>
+        </li>
+        {% endif %}
+        {% if request.user.is_authenticated %}
+                <li class="nav-item">
+          <a class="btn btn-danger" href="{% url 'logout' %}">Выйти</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="btn btn-secondary" href="/register">Регистрация</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="btn btn-info" href="{% url 'login' %}">Авторизация</a>
+        {% endif %}
+        </li>
+      </ul>
+</nav>
+
+<!-- body -->
+<div class ="container-fluid mt-3">
+
+  <div class="row">
+
+    <!-- filter -->
+
+
+    <div class="col-lg-2 mx-auto">
+
+      <div class="list-group">
+
+            <a href="/" class="btn btn-warning"> Все категории </a>
+        {% for category in categories %}
+        <a href="{{ category.url }}" class="list-group-item list-group-item-action ">{{category.name}} ({{ category.count }})</a>
+        {% endfor %}
+      </div>
+    </div>
+
+<!-- all products -->
+<div id='products' class="col-lg-9 mx-auto" >
+
+  <!-- block content-->
+  {% block content %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
+    {% endfor %}
+  {% endif %}
+
+    {% endblock %}
+<!-- endblock content-->
+
+  <div class="row mx-auto">
+
+    {% for product in products %}
+      <div class="card mx-auto mb-3" style="width: 18rem;">
+        <a href="{{ product.get_absolute_url }}"></a><img src="{{ product.image.url }}" class="card-img-top " alt="Card image cap" width="100" height="250">
+      <div class="card-body">
+      <p class="card-title"><a href="{{ product.get_absolute_url }}">{{product.name}}</a></p>
+      <p class="card-text"><b>{{product.price}}$</b></p>
+      <p class="text-bg-info p-1"><b>{{product.category}}</b></p>
+        <p class="card-text">{{product.description}}</p>
+          <a href="{% url 'add_to_cart' ct_model=product.get_model_name slug=product.slug %}"><button class="btn btn-danger">В корзину</button></a>
+      </div>
+
+        </div>
+
+      {% endfor %}
+  </div>
+  </div>
+
+
+
+<!--     Optional JavaScript -->
+<!--   jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  </div>
+</div>
+      <br>
+
+</body>
+
+

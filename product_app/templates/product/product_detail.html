@@ -1,0 +1,160 @@
+{% extends 'base_app/base.html' %}
+{% load static %}
+{% load product_detail %}
+
+
+{% block content %}
+
+<!-- breadcrumb -->
+    <nav aria-label="breadcrumb" class="mt-4">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'category_detail' slug=product.category.slug %}">{{ product.category }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+  </ol>
+</nav>
+<!--end breadcrumb-->
+<div class="row">
+
+    <div class="col-md-4">
+        <img src="{{ product.image.url }}" class="img-fluid">
+    </div>
+    <div class="col-md-8">
+        <h3>{{ product.name }}</h3>
+        <p> Цена: {{ product.price }}р.</p>
+        <p> Описание: {{ product.description }}</p>
+        <p> Категория: {{ product.category }}</p>
+        <hr>
+
+        <a href="{% url 'add_to_cart' ct_model=ct_model slug=product.slug %}"><button class="btn btn-danger">Добавить в корзину</button></a>
+
+    </div>
+
+    <p class="mt-4">Характеристики: </p>
+
+    <!--filter-->
+    {{ product|product_detail }}
+    <!--end filter-->
+
+<!-- Второй вариант передачи характеристик в шаблон
+        {% if product.category.slug == 'sport' %}-->
+<!--        {% include 'product/sport_product.html' %}-->
+<!--    {% else %}-->
+<!--        {% include 'product/appliance_product.html' %}-->
+<!--    {% endif %}-->
+<br>
+                {% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+
+</ul>
+{% endif %}
+
+    <div class="row">
+        <div class="col-md-9">
+
+            <form action="{% url 'add_review' ct_model=ct_model slug=product.slug %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h5>Write Your Review</h5>
+
+                <div>
+        <!--Rating Stars-->
+                    <label>Какой рейтинг ставим?</label>
+                    <br>
+                    <div class="rate">
+                        <input type="radio" name="rating" id="rating9" value="5" required /><label for="rating9" title="5"></label>
+                        <input type="radio" name="rating" id="rating8" value="4.5" required /><label for="rating8" title="4.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating7" value="4" required /><label for="rating7" title="4"></label>
+                        <input type="radio" name="rating" id="rating6" value="3.5" required /><label for="rating6" title="3.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating5" value="3" required /><label for="rating5" title="3"></label>
+                        <input type="radio" name="rating" id="rating4" value="2.5" required /><label for="rating4" title="2.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating3" value="2" required /><label for="rating3" title="2"></label>
+                        <input type="radio" name="rating" id="rating2" value="1.5" required /><label for="rating2" title="1.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating1" value="1" required /><label for="rating1" title="1"></label>
+                        </div>
+        <br>
+                    Review Title:
+                    <input type="text" class="form-control" name="subject">
+                    <br>
+                    Review:
+                    <textarea name="review" class="form-control" rows="4"></textarea>
+                    <br>
+                    Choose a review image:
+                    <br>
+                    <input type="file" class="form-control" name="image">
+                    <br>
+                    {% if user.is_authenticated %}
+                    <input type="submit" value="Submit Review" class="btn btn-primary">
+                    {% else %}
+                    <p>Тебе нужно авторизоваться что-бы оставлять отзыв! <span><a href="{% url 'login' %}">Перейди к авторизации</a></span></p>
+                    {% endif %}
+                </div>
+
+            </form>
+<br>
+            <!--------------------------Recently Viewed------------------------->
+
+<div class="container">
+
+  <br>
+  <h2>Recently Viewed:</h2>
+<div class="related">
+    {% for recent_product in recently_viewed_products %}
+  <img src="{{ recent_product.image.url }}" class="related_image" alt="">
+    {% endfor %}
+</div>
+</div>
+             <br>
+            <!--------------------------END Recently Viewed------------------------->
+            <!--------------------------Review------------------------->
+            <header class="section-heading">
+                <h3>Отзывы покупателей:</h3>
+            </header>
+
+            <article class="box mb-3">
+                <div class="icontext w-1000">
+
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="product-reviews">
+                    {% for c in reviews %}
+                    <div class="single-review">
+                        <div class="review-heading">
+
+                            <div><i class="fa fa-user-o"></i> <b>{{ c.user }}</b></div>
+                            <div><i class="fa fa-clock-o"></i> {{ c.created_at }}</div>
+                            <div><a href="#"><i class="fa fa-clock-o"></i> {{ c.content_object }}</a></div>
+                            <div><img src="{{ c.image }}" class="img-fluid"></div>
+                            <div class="review-rating pull-right">
+
+                                <i class="fa fa-star{% if c.rating < 1 %}-o empty{% endif %}"></i>
+                                <i class="fa fa-star{% if c.rating < 2 %}-o empty{% endif %}"></i>
+                                <i class="fa fa-star{% if c.rating < 3 %}-o empty{% endif %}"></i>
+                                <i class="fa fa-star{% if c.rating < 4 %}-o empty{% endif %}"></i>
+                                <i class="fa fa-star{% if c.rating < 5 %}-o empty{% endif %}"></i>
+
+                            </div>
+                        </div>
+                        <div class="review-body"> <strong>{{ c.subject }}</strong>
+                            <p><h3>{{ c.review }}</h3></p>
+                        </div>
+                    </div>
+                                                    {% endfor %}
+											</div>
+										</div>
+    </div>
+    </article>
+
+    </div>
+                <!--------------------------End Review------------------------->
+</div>
+</html>
+
+
+{% endblock content %}
